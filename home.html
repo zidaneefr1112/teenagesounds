@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teenage Sounds</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ts-pink: #ff007f;
+      --ts-dark: #000000;
+      --ts-white: #ffffff;
+      --ts-gray: #f5f5f5;
+    }
+
+    /* Dark Theme Variables */
+    [data-theme="dark"] {
+      --bg-primary: #000000;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #111111;
+      --text-primary: #ffffff;
+      --text-secondary: #dddddd;
+      --text-muted: #cccccc;
+      --text-gray: #999999;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --navbar-bg: rgba(10, 10, 10, 0.95);
+      --navbar-bg-scrolled: rgba(10, 10, 10, 0.98);
+      --shadow-color: rgba(255, 0, 127, 0.1);
+      --shadow-color-hover: rgba(255, 0, 127, 0.3);
+      --slider-overlay: rgba(0, 0, 0, 0.4);
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-hover-bg: rgba(255, 0, 127, 0.2);
+    }
+
+    /* Light Theme Variables */
+    [data-theme="light"] {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-tertiary: #e9ecef;
+      --text-primary: #212529;
+      --text-secondary: #495057;
+      --text-muted: #6c757d;
+      --text-gray: #868e96;
+      --border-color: rgba(0, 0, 0, 0.1);
+      --navbar-bg: rgba(255, 255, 255, 0.95);
+      --navbar-bg-scrolled: rgba(255, 255, 255, 0.98);
+      --shadow-color: rgba(0, 0, 0, 0.1);
+      --shadow-color-hover: rgba(255, 0, 127, 0.2);
+      --slider-overlay: rgba(255, 255, 255, 0.3);
+      --glass-bg: rgba(0, 0, 0, 0.1);
+      --glass-border: rgba(0, 0, 0, 0.2);
+      --glass-hover-bg: rgba(255, 0, 127, 0.1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s ease-out;
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scroll-fade {
+      opacity: 0;
+      transform: translateY(60px);
+      transition: all 0.8s ease-out;
+    }
+
+    .scroll-fade.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .navbar {
+      background-color: var(--navbar-bg);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 20px var(--shadow-color);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .navbar.scrolled {
+      background-color: var(--navbar-bg-scrolled);
+      box-shadow: 0 2px 30px var(--shadow-color-hover);
+    }
+
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .navbar a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .navbar a:hover {
+      color: var(--ts-pink);
+      transform: translateY(-2px);
+    }
+
+    .navbar a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--ts-pink);
+      transition: width 0.3s ease;
+    }
+
+    .navbar a:hover::after {
+      width: 100%;
+    }
+
+    .logo img {
+      height: 40px;
+    }
+
+    /* Theme Toggle Switch */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: 20px;
+    }
+
+    .theme-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .theme-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .theme-slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .theme-slider {
+      background-color: var(--ts-pink);
+    }
+
+    input:checked + .theme-slider:before {
+      transform: translateX(26px);
+    }
+
+    .theme-icons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.2em;
+    }
+
+    /* === SLIDER + LOGO OVERLAY === */
+    .top-slider {
+      position: relative;
+      width: 100%;
+      height: 75vh;
+      overflow: hidden;
+    }
+
+    .top-slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      transform: scale(1.15);
+      filter: brightness(0.4);
+    }
+
+    [data-theme="light"] .top-slide {
+      filter: brightness(0.7);
+    }
+
+    .top-slide.active {
+      opacity: 1;
+      z-index: 1;
+    }
+
+    .slider-logo-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      text-align: center;
+    }
+
+    .slider-logo-overlay img {
+      width: 400px;
+      max-width: 80%;
+      height: auto;
+    }
+
+    .slider-logo-overlay p {
+      margin-top: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1em;
+      font-weight: 500;
+      color: #ffffff;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      position: relative;
+      display: inline-block;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: 1px solid var(--glass-border);
+      transition: all 0.3s ease;
+    }
+
+    .slider-logo-overlay p:hover {
+      background: var(--glass-hover-bg);
+      border-color: var(--ts-pink);
+      color: #ffffff;
+    }
+
+    .bottom-fade {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, var(--bg-primary) 100%);
+      z-index: 2;
+    }
+
+    .section {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .section h2 {
+      color: var(--ts-pink);
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .section p {
+      font-size: 1.1em;
+      line-height: 1.7em;
+      color: var(--text-secondary);
+    }
+
+    .artikel-grid,
+    .artikel-featured {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      background-color: var(--bg-tertiary);
+      color: var(--text-gray);
+      font-size: 0.9em;
+    }
+
+    /* Frame Article Grid */
+    .frame-article-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .frame-article {
+      background-color: var(--bg-secondary);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--text-primary);
+      box-shadow: 0 10px 20px var(--shadow-color);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .frame-article:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 30px var(--shadow-color-hover);
+    }
+
+    .frame-article img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+
+    .frame-article .content {
+      padding: 20px;
+    }
+
+    .frame-article h3 {
+      color: var(--ts-pink);
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .frame-article p {
+      font-size: 0.95em;
+      color: var(--text-muted);
+      line-height: 1.5em;
+    }
+
+    /* Article Featured and Grid */
+    .artikel-featured {
+      background-color: var(--bg-secondary);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .artikel-featured small {
+      color: #00bfff;
+    }
+
+    .artikel-featured h3 {
+      color: var(--text-primary);
+      margin: 10px 0;
+      font-size: 1.8em;
+    }
+
+    .artikel-featured p {
+      color: var(--text-muted);
+    }
+
+    .artikel-featured span {
+      font-size: 0.9em;
+      color: var(--text-gray);
+    }
+
+    .artikel-mini {
+      background: var(--bg-secondary) !important;
+      color: var(--text-primary) !important;
+    }
+
+    .artikel-mini h4 {
+      color: var(--text-primary) !important;
+    }
+
+    .artikel-mini span {
+      color: var(--text-gray) !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 15px 20px;
+      }
+      
+      .navbar-nav {
+        gap: 15px;
+      }
+      
+      .theme-toggle {
+        margin-left: 15px;
+      }
+      
+      .theme-switch {
+        width: 50px;
+        height: 28px;
+      }
+      
+      .theme-slider:before {
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+      }
+      
+      input:checked + .theme-slider:before {
+        transform: translateX(22px);
+      }
+      
+      .slider-logo-overlay p {
+        font-size: 1em;
+        letter-spacing: 2px;
+        padding: 8px 16px;
+      }
+      
+      .frame-article-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .slider-logo-overlay p {
+        font-size: 0.9em;
+        letter-spacing: 1.5px;
+        padding: 6px 12px;
+      }
+      
+      .frame-article-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <img src="logots.bg-removebg-preview.png" alt="Logo">
+      </a>
+    </div>
+    <div class="navbar-nav">
+      <a href="home.html">Home</a>
+      <div class="theme-toggle">
+        <div class="theme-icons">
+          <span>🌙</span>
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="theme-slider"></span>
+          </label>
+          <span>☀️</span>
+        </div>
+      </div>
+      <a href="lineup.html">Line Up</a>
+      <a href="merch.html">Merch</a>
+      <a href="news.html">News</a>
+    </div>
+  </div>
+
+  <!-- SLIDER ATAS -->
+  <div class="top-slider">
+    <div class="slider-logo-overlay">
+      <img src="logots.bg-removebg-preview.png" alt="Teenage Sounds Logo">
+      <p>Teenagers Creativity & Action</p>
+    </div>
+
+    <div class="top-slide active" style="background-image: url('lineupbg1.jpg');"></div>
+    <div class="top-slide" style="background-image: url('lineupbg2.jpg');"></div>
+    <div class="top-slide" style="background-image: url('lineupbg3.jpg');"></div>
+    <div class="top-slide" style="background-image: url('porto4.jpg');"></div>
+
+    <div class="bottom-fade"></div>
+  </div>
+
+  <!-- DESKRIPSI -->
+  <section class="section fade-up">
+    <h2>Apa itu Teenage Sounds?</h2>
+    <p>
+      Teenage Sounds adalah ruang berkarya bagi musisi dan komunitas muda. Mengusung semangat kolaborasi lintas genre,
+      kami menghadirkan panggung alternatif untuk suara-suara segar dari generasi sekarang.
+    </p>
+  </section>
+
+  <!-- FRAME ARTIKEL SECTION -->
+  <div class="frame-article-grid">
+    <a href="porto1.html" class="frame-article">
+      <img src="porto1.jpg" alt="Frame 1">
+      <div class="content">
+        <h3>Teenage Sounds Gigs Vol 1</h3>
+        <p>Intip suasana sebelum panggung dimulai di TS Vol.1.</p>
+      </div>
+    </a>
+    <a href="porto2.html" class="frame-article">
+      <img src="porto2.jpg" alt="Frame 2">
+      <div class="content">
+        <h3>Teenage Sounds Tribute</h3>
+        <p>Dokumentasi tata cahaya dan suasana crowd yang intens.</p>
+      </div>
+    </a>
+    <a href="porto3.html" class="frame-article">
+      <img src="porto3.jpg" alt="Frame 3">
+      <div class="content">
+        <h3>Teenage Sounds Gigs Vol 2</h3>
+        <p>Arena moshpit para jagoan</p>
+      </div>
+    </a>
+    <a href="porto4.html" class="frame-article">
+      <img src="porto4.jpg" alt="Frame 4">
+      <div class="content">
+        <h3>Intimates Talkcase With TheSoundsProject</h3>
+        <p>Band indie dengan nuansa dreamy yang menghipnotis penonton.</p>
+      </div>
+    </a>
+    <a href="porto5.html" class="frame-article">
+      <img src="porto5.jpg" alt="Frame 5">
+      <div class="content">
+        <h3>Teenage Sounds : Pesta Cedera Ringan</h3>
+        <p>Kolaborasi visual art & komunitas dalam ruang ekspresi.</p>
+      </div>
+    </a>
+    <a href="porto6.html" class="frame-article">
+      <img src="porto6.jpg" alt="Frame 6">
+      <div class="content">
+        <h3>Teenage Sounds Gigs Vol 3</h3>
+        <p>Para pengunjung dan penampil yang menjadi satu malam itu.</p>
+      </div>
+    </a>
+    <a href="porto7.html" class="frame-article">
+      <img src="porto7.jpg" alt="Frame 7">
+      <div class="content">
+        <h3>Teenage Sounds Showcase : Sambutlah Generasi Baru</h3>
+        <p>Keseruan malam puncak Teenage Sounds Vol.1.</p>
+      </div>
+    </a>
+  </div>
+
+  <section class="section fade-up">
+    <h2>Terkini</h2>
+
+    <div class="artikel-featured">
+      <a href="artikelhome1.html" style="flex: 1; text-decoration: none; color: inherit;">
+        <img src="lineupbg1.jpg" alt="Artikel 1" style="width: 100%; border-radius: 10px;">
+      </a>
+      <div style="flex: 1;">
+        <small style="color: #00bfff;">Sebuah utas</small>
+        <h3 style="margin: 10px 0; font-size: 1.8em;">Teenage Sounds, kolektif remaja yang lahir dari bumi Kebayoran</h3>
+        <p style="color: var(--text-muted);">Perjalanan menemukan ruang alternatif di skena musik Jakarta terus berjalan hingga hari ini.</p>
+        <span style="font-size: 0.9em; color: var(--text-gray);">Narpati Zidane • Jul 10, 2025</span>
+      </div>
+    </div>
+
+    <div class="artikel-grid">
+      <a href="artikelhome2.html" class="artikel-mini" style="display: flex; gap: 15px; text-decoration: none; background: var(--bg-secondary); padding: 10px; border-radius: 10px; width: 280px;">
+        <img src="ss.jpg" alt="Mini 1" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+        <div style="color: var(--text-primary);">
+          <small style="color: #00bfff;">Review</small>
+          <h4 style="margin: 5px 0;">Ulasan Album Terbaru Silent Spring Yang Mendunia</h4>
+          <span style="font-size: 0.8em; color: var(--text-gray);">Jul 10, 2025</span>
+        </div>
+      </a>
+
+      <a href="artikelhome3.html" class="artikel-mini" style="display: flex; gap: 15px; text-decoration: none; background: var(--bg-secondary); padding: 10px; border-radius: 10px; width: 280px;">
+        <img src="adira.jpg" alt="Mini 2" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+        <div style="color: var(--text-primary);">
+          <small style="color: #00bfff;">Bising Kota</small>
+          <h4 style="margin: 5px 0;">Faiz, salah satu Anggota TS berimigran dari Afrika</h4>
+          <span style="font-size: 0.8em; color: var(--text-gray);">Jul 10, 2025</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="footer fade-up">
+    © 2025 Teenage Sounds. All rights reserved.
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    
+    // Check for saved theme preference or default to 'dark'
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    body.setAttribute('data-theme', savedTheme);
+    themeToggle.checked = savedTheme === 'light';
+    
+    themeToggle.addEventListener('change', function() {
+      if (this.checked) {
+        body.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    // Scroll Animation Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    });
+
+    document.querySelectorAll('.fade-up, .scroll-fade').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Navbar Scroll Effect
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Slider Logic
+    const slides = document.querySelectorAll('.top-slide');
+    let index = 0;
+
+    function nextSlide() {
+      slides.forEach(slide => slide.classList.remove('active'));
+      index = (index + 1) % slides.length;
+      slides[index].classList.add('active');
+    }
+
+    setInterval(nextSlide, 4000);
+  </script>
+
+</body>
+</html>
